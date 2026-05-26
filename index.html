@@ -18,110 +18,119 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header class="site-header" aria-label="主页导航">
-      <a class="brand" href="#top" aria-label="AI爱好者首页">
+    <header class="site-header" aria-label="主页导航" data-i18n-attr="aria-label:header.aria">
+      <a class="brand" href="#top" aria-label="AI爱好者首页" data-i18n-attr="aria-label:brand.aria">
         <span class="brand-mark">AI</span>
-        <span>AI爱好者</span>
+        <span data-i18n="brand.name">AI爱好者</span>
       </a>
-      <nav class="nav-links" aria-label="页面导航">
-        <a href="#record">实验记录</a>
-        <a href="#topics">内容方向</a>
-        <a href="#follow">关注入口</a>
-      </nav>
+      <div class="header-actions">
+        <nav class="nav-links" aria-label="页面导航" data-i18n-attr="aria-label:nav.aria">
+          <a href="#record" data-i18n="nav.record">实验记录</a>
+          <a href="#topics" data-i18n="nav.topics">内容方向</a>
+          <a href="#follow" data-i18n="nav.follow">关注入口</a>
+        </nav>
+        <div class="language-switch" aria-label="语言切换" data-i18n-attr="aria-label:language.aria">
+          <button type="button" class="is-active" data-lang="zh">中</button>
+          <button type="button" data-lang="en">EN</button>
+        </div>
+      </div>
     </header>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">AI side hustle lab</p>
-          <h1 id="hero-title">一个普通 AI 爱好者的副业实验记录</h1>
-          <p class="hero-lede">
+          <p class="eyebrow" data-i18n="hero.eyebrow">AI副业实验室</p>
+          <h1 id="hero-title" data-i18n="hero.title">一个普通 AI 爱好者的副业实验记录</h1>
+          <p class="hero-lede" data-i18n-html="hero.lede">
             我花了约3000元买 AI 工具，还没找到稳定变现闭环。这里记录从
             <strong>AI消费者</strong> 到 <strong>AI生产者</strong> 的真实过程。
           </p>
-          <div class="hero-actions" aria-label="主要操作">
-            <a class="button primary" href="#follow">关注我的内容记录</a>
-            <a class="button secondary" href="#record">查看实验复盘</a>
+          <div class="hero-actions" aria-label="主要操作" data-i18n-attr="aria-label:hero.actionsAria">
+            <a class="button primary" href="#follow" data-i18n="hero.primary">关注我的内容记录</a>
+            <a class="button secondary" href="#record" data-i18n="hero.secondary">查看实验复盘</a>
           </div>
         </div>
 
-        <figure class="hero-visual" aria-label="AI工具实验台主视觉">
+        <figure class="hero-visual" aria-label="AI工具实验台主视觉" data-i18n-attr="aria-label:hero.visualAria">
           <img
             src="./assets/ai-lab-dashboard.png"
             alt="由多个AI工具、实验数据和内容工作流组成的科技感个人工作台"
+            data-i18n-attr="alt:hero.visualAlt"
           />
         </figure>
       </section>
 
-      <section class="signal-strip" aria-label="当前实验状态">
+      <section class="signal-strip" aria-label="当前实验状态" data-i18n-attr="aria-label:stats.aria">
         <article>
           <span class="metric" data-config="toolSpend">3000元+</span>
-          <span>AI工具投入</span>
+          <span data-i18n="stats.spendLabel">AI工具投入</span>
         </article>
         <article>
-          <span class="metric">3类工具</span>
+          <span class="metric" data-i18n="stats.toolsValue">3类工具</span>
           <span>ChatGPT / Claude / Midjourney</span>
         </article>
         <article>
-          <span class="metric">1个目标</span>
-          <span>找到第一个变现闭环</span>
+          <span class="metric" data-i18n="stats.goalValue">1个目标</span>
+          <span data-i18n="stats.goalLabel">找到第一个变现闭环</span>
         </article>
       </section>
 
       <section id="record" class="section feature-section" aria-labelledby="record-title">
         <div class="section-heading">
-          <p class="eyebrow">latest review</p>
-          <h2 id="record-title">最新复盘</h2>
+          <p class="eyebrow" data-i18n="record.eyebrow">最新复盘</p>
+          <h2 id="record-title" data-i18n="record.title">最新复盘</h2>
         </div>
         <article class="feature">
           <div>
-            <p class="tag">开篇记录</p>
-            <h3>我花了3000元买AI工具，3个月后的真实ROI复盘</h3>
-            <p>
+            <p class="tag" data-i18n="record.tag">开篇记录</p>
+            <h3 data-i18n="record.articleTitle">我花了3000元买AI工具，3个月后的真实ROI复盘</h3>
+            <p data-i18n="record.summary">
               不是讲成功案例，而是把账单、尝试、踩坑和下一步路径摊开。先算清楚钱花到哪里，再判断哪些工具真的值得继续投入。
             </p>
           </div>
-          <a class="text-link" href="#follow" data-config="featuredLink">等平台发布后同步链接</a>
+          <a class="text-link" href="#follow" data-config="featuredLink" data-i18n="record.link">
+            等平台发布后同步链接
+          </a>
         </article>
       </section>
 
       <section id="topics" class="section" aria-labelledby="topics-title">
         <div class="section-heading">
-          <p class="eyebrow">content map</p>
-          <h2 id="topics-title">我会持续记录什么</h2>
+          <p class="eyebrow" data-i18n="topics.eyebrow">内容地图</p>
+          <h2 id="topics-title" data-i18n="topics.title">我会持续记录什么</h2>
         </div>
         <div class="topic-grid">
           <article>
             <span class="topic-icon">01</span>
-            <h3>AI工具实测</h3>
-            <p>真实记录工具费用、使用频率、节省时间和实际产出，避免被AI焦虑绑架。</p>
+            <h3 data-i18n="topics.toolTitle">AI工具实测</h3>
+            <p data-i18n="topics.toolCopy">真实记录工具费用、使用频率、节省时间和实际产出，避免被AI焦虑绑架。</p>
           </article>
           <article>
             <span class="topic-icon">02</span>
-            <h3>AI内容创作</h3>
-            <p>用AI做写作、设计、视频和选题，记录人机协作中真正有效的工作流。</p>
+            <h3 data-i18n="topics.contentTitle">AI内容创作</h3>
+            <p data-i18n="topics.contentCopy">用AI做写作、设计、视频和选题，记录人机协作中真正有效的工作流。</p>
           </article>
           <article>
             <span class="topic-icon">03</span>
-            <h3>AI变现探索</h3>
-            <p>尝试内容、服务、工具包和轻咨询，用数据复盘哪些路径靠谱，哪些浪费时间。</p>
+            <h3 data-i18n="topics.moneyTitle">AI变现探索</h3>
+            <p data-i18n="topics.moneyCopy">尝试内容、服务、工具包和轻咨询，用数据复盘哪些路径靠谱，哪些浪费时间。</p>
           </article>
         </div>
       </section>
 
       <section id="follow" class="section follow-section" aria-labelledby="follow-title">
         <div class="section-heading">
-          <p class="eyebrow">follow the build</p>
-          <h2 id="follow-title">关注我的内容记录</h2>
-          <p>第一版先同步内容账号。没有开通或未填写链接的平台，会显示为“即将同步”。</p>
+          <p class="eyebrow" data-i18n="follow.eyebrow">关注构建过程</p>
+          <h2 id="follow-title" data-i18n="follow.title">关注我的内容记录</h2>
+          <p data-i18n="follow.copy">第一版先同步内容账号。没有开通或未填写链接的平台，会显示为“即将同步”。</p>
         </div>
         <div class="platform-grid" data-platforms></div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <span>AI爱好者</span>
-      <span>不贩卖成功学，只分享可验证的真实过程。</span>
+      <span data-i18n="brand.name">AI爱好者</span>
+      <span data-i18n="footer.copy">不贩卖成功学，只分享可验证的真实过程。</span>
     </footer>
 
     <script src="./script.js"></script>
