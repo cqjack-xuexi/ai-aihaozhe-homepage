@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI爱好者 | AI副业实验记录</title>
+    <meta
+      name="description"
+      content="记录一个普通AI爱好者从花钱买工具到找到变现闭环的真实过程：AI工具实测、内容创作、变现探索。"
+    />
+    <meta name="theme-color" content="#07121f" />
+    <meta property="og:title" content="AI爱好者 | AI副业实验记录" />
+    <meta
+      property="og:description"
+      content="不贩卖成功学，只分享可验证的AI工具投入、内容实验和变现复盘。"
+    />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="主页导航">
+      <a class="brand" href="#top" aria-label="AI爱好者首页">
+        <span class="brand-mark">AI</span>
+        <span>AI爱好者</span>
+      </a>
+      <nav class="nav-links" aria-label="页面导航">
+        <a href="#record">实验记录</a>
+        <a href="#topics">内容方向</a>
+        <a href="#follow">关注入口</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">AI side hustle lab</p>
+          <h1 id="hero-title">一个普通 AI 爱好者的副业实验记录</h1>
+          <p class="hero-lede">
+            我花了约3000元买 AI 工具，还没找到稳定变现闭环。这里记录从
+            <strong>AI消费者</strong> 到 <strong>AI生产者</strong> 的真实过程。
+          </p>
+          <div class="hero-actions" aria-label="主要操作">
+            <a class="button primary" href="#follow">关注我的内容记录</a>
+            <a class="button secondary" href="#record">查看实验复盘</a>
+          </div>
+        </div>
+
+        <figure class="hero-visual" aria-label="AI工具实验台主视觉">
+          <img
+            src="./assets/ai-lab-dashboard.png"
+            alt="由多个AI工具、实验数据和内容工作流组成的科技感个人工作台"
+          />
+        </figure>
+      </section>
+
+      <section class="signal-strip" aria-label="当前实验状态">
+        <article>
+          <span class="metric" data-config="toolSpend">3000元+</span>
+          <span>AI工具投入</span>
+        </article>
+        <article>
+          <span class="metric">3类工具</span>
+          <span>ChatGPT / Claude / Midjourney</span>
+        </article>
+        <article>
+          <span class="metric">1个目标</span>
+          <span>找到第一个变现闭环</span>
+        </article>
+      </section>
+
+      <section id="record" class="section feature-section" aria-labelledby="record-title">
+        <div class="section-heading">
+          <p class="eyebrow">latest review</p>
+          <h2 id="record-title">最新复盘</h2>
+        </div>
+        <article class="feature">
+          <div>
+            <p class="tag">开篇记录</p>
+            <h3>我花了3000元买AI工具，3个月后的真实ROI复盘</h3>
+            <p>
+              不是讲成功案例，而是把账单、尝试、踩坑和下一步路径摊开。先算清楚钱花到哪里，再判断哪些工具真的值得继续投入。
+            </p>
+          </div>
+          <a class="text-link" href="#follow" data-config="featuredLink">等平台发布后同步链接</a>
+        </article>
+      </section>
+
+      <section id="topics" class="section" aria-labelledby="topics-title">
+        <div class="section-heading">
+          <p class="eyebrow">content map</p>
+          <h2 id="topics-title">我会持续记录什么</h2>
+        </div>
+        <div class="topic-grid">
+          <article>
+            <span class="topic-icon">01</span>
+            <h3>AI工具实测</h3>
+            <p>真实记录工具费用、使用频率、节省时间和实际产出，避免被AI焦虑绑架。</p>
+          </article>
+          <article>
+            <span class="topic-icon">02</span>
+            <h3>AI内容创作</h3>
+            <p>用AI做写作、设计、视频和选题，记录人机协作中真正有效的工作流。</p>
+          </article>
+          <article>
+            <span class="topic-icon">03</span>
+            <h3>AI变现探索</h3>
+            <p>尝试内容、服务、工具包和轻咨询，用数据复盘哪些路径靠谱，哪些浪费时间。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="follow" class="section follow-section" aria-labelledby="follow-title">
+        <div class="section-heading">
+          <p class="eyebrow">follow the build</p>
+          <h2 id="follow-title">关注我的内容记录</h2>
+          <p>第一版先同步内容账号。没有开通或未填写链接的平台，会显示为“即将同步”。</p>
+        </div>
+        <div class="platform-grid" data-platforms></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>AI爱好者</span>
+      <span>不贩卖成功学，只分享可验证的真实过程。</span>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
