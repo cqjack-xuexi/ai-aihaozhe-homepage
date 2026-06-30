@@ -2,8 +2,8 @@
 title: 内容来源标注规范与 Codex↔Claude 双向审核协议
 topic: provenance-and-review-protocol
 doc_type: spec
-version: 3
-date: 2026-06-30
+version: 4
+date: 2026-07-01
 authored_by: claude-code
 generated_with: claude-code@2.1.196
 committed_by: win11-01
@@ -22,16 +22,19 @@ superseded_by: null
 > 字段,不进文件名。它本身是 **Mode A 直接产物**(由 claude-code 直接写入仓库),
 > 故 `source_raw: null`。它正在按自己定义的流程接受审核。
 >
-> **v3 修订**(回应 codex R2 `changes-requested`):转移表拆分 `blocked` 恢复为两个
-> 确定事件、补 `superseded` 进入路径、reviewer 转移写 `reviewed_by`(§3.2);重写
-> push 失败恢复为 `git fetch` + 读 `origin` 分支 thread 的可执行顺序(§3.1);定义
-> raw `command` 单行+转义语法(§2.2);L0 改为"不满足 L1/L2 的兜底",`provenance_level`
-> 升为正式必填字段并入 schema/模板(§2.3、§5)。
+> **v4 修订**(回应 codex R3 `changes-requested`):§3.1 给 `reset --hard` 恢复加
+> clean-worktree 前置(规则 0)+ backup ref 兜底,禁止无条件 reset 销毁无关改动;
+> §2.2 把 raw 转义从"只定义编码"补成**单遍从左到右的唯一解码算法**并附 `\\n`/
+> 行尾反斜杠等例子。
 >
-> **v2 修订**(回应 codex R1):区分「声明」与「验证」并定义 Mode A 最低佐证(§2.1);
-> 用确定性转移表重写状态机、纳入 `blocked`/`merged`、明确 round 语义(§3.2);定义
-> raw 为无 frontmatter 附件(§2.2);`generated_with` 强制 `工具@版本`;补 push
-> 原子性/并发/失败规则(§3.1);修复 review 模板路径与附录 status↔verdict 矛盾。
+> **v3 修订**(回应 codex R2):转移表拆分 `blocked` 恢复为两事件、补 `superseded`
+> 进入路径、reviewer 转移写 `reviewed_by`;push 失败恢复改 `git fetch`+读 `origin`
+> thread 的可执行顺序;定义 raw `command` 单行+转义;L0 改兜底,`provenance_level`
+> 升正式字段(写时必填/读时缺省 L0)。
+>
+> **v2 修订**(回应 codex R1):区分「声明」与「验证」并定义 Mode A 最低佐证;确定性
+> 转移表重写状态机、纳入 `blocked`/`merged`;raw 定为无 frontmatter 附件;
+> `generated_with` 强制 `工具@版本`;补 push 原子性规则;修复 review 模板路径与附录矛盾。
 
 ## 1. 为什么需要这套规范
 
@@ -106,9 +109,15 @@ Codex 写方案 ──→ Claude CLI 只读审核(输出到终端)──→ Code
 
 - **每个头部字段恰好占一物理行**,以 `#@ ` 起始、形如 `#@ <key>: <value>`。
   解析器逐行读取,遇到第一个独占行 `#@ ---` 即停止解析头部、其后全部视为正文。
-- **头部值不得含裸换行**:`command` 必须单行;命令本身的换行写成字面 `\n`、
-  反斜杠写成 `\\`,由读者反转义。这样任何物理换行都只可能是字段分隔或正文边界,
-  不会与 `command` 的内容混淆。
+- **头部值不得含裸换行**:`command` 必须单行;编码规则——真实反斜杠写 `\\`、真实换行
+  写 `\n`(其余字符原样)。这样任何物理换行都只可能是字段分隔或正文边界。
+- **解码算法(唯一)**:对值做**单遍、从左到右**扫描;遇 `\` 时**只看紧邻的下一个字符**:
+  `\\`→一个反斜杠、`\n`→一个换行,**消费掉这两个字符后继续**;`\` 后跟其他字符
+  视为非法、报错(不静默保留)。单遍消费保证不会二次扫描已解码的输出。
+  - 例:`\\n` → 先吃 `\\` 得一个反斜杠,再读到剩下的 `n`(普通字符)→ 结果是字面
+    两字符 `\n`(**不是换行**)。
+  - 例:`a\nb` → `a`+换行+`b`。
+  - 例:行尾 `foo\\` → `foo` + 一个反斜杠。
 - 头部**不属于**"逐字原文",是人工添加的捕获上下文;`#@ ---` 边界行以下才是不可改动的原文。
 - `captured_at` 用 ISO-8601 带时区。
 - `source_raw_sha256` 对**整个 raw 文件**(含头部)计算,锁定提交时的完整内容。
@@ -159,6 +168,7 @@ round | date | actor | artifact 路径 | verdict | next-turn
 每个 agent 动手前的固定动作:
 
 ```
+git status --porcelain                # 必须为空:工作树/暂存区干净才能开始(见规则 0)
 git pull --ff-only                    # 取回对方最新产物;非快进则停下核对
 读 docs/reviews/<topic>.thread.md      # 确认 turn 是不是自己
   └─ 不是 → 停,不要动手
@@ -170,6 +180,9 @@ git commit + git push                 # 完成交接
 
 **原子性、并发与失败规则:**
 
+0. **交接全程要求 clean worktree**:动手前 `git status --porcelain` 必须为空;若有
+   未提交修改,先提交到别处或 stash,**不得在带未提交改动时进入交接流程**。这是规则 3
+   的恢复能安全执行的前提。
 1. **交接 commit 必须原子**:产物文件与 `thread` 的更新写进**同一个 commit**。
    不允许"先提交产物、后单独改 thread"的两次提交——读者看到产物时 `turn` 必须已翻转。
 2. **共享分支禁止 force push**:`standards/*`、`design/*` 等协作分支永不 `--force` /
@@ -177,13 +190,18 @@ git commit + git push                 # 完成交接
 3. **push 被拒 = 交接未完成**:若 push 因非快进被拒,说明对方已先 push,此时本地交接
    commit 与远程已**分叉**(`git pull --ff-only` 必然失败,故不能用它恢复)。可执行顺序:
    ```
+   git status --porcelain                            # 再次确认工作树干净(规则 0);非空则停,人工处理
    git fetch origin                                  # 只取远程,不动本地分支
+   git branch backup/<topic>-<时间戳> HEAD           # 给本地失效 commit 留备份 ref,再丢弃才安全
    git show origin/<branch>:docs/reviews/<topic>.thread.md   # 读远程最新 thread
    核对其 turn:
      ├─ turn 已不是自己 → 你这一步作废:git reset --hard origin/<branch>
-     │                     (丢弃本地未推送的交接;不得 force push 覆盖远程),按新状态重走
+     │                     (仅丢弃本地未推送的交接;已由 backup ref 兜底,且工作树本就干净;
+     │                      不得 force push 覆盖远程),按新状态重走
      └─ turn 仍是自己   → git rebase origin/<branch> → 重新 git push
    ```
+   `reset --hard` 只在「工作树干净 + 已建 backup ref」两条都满足时才允许执行;
+   任一不满足则停止并人工处理,**不得无条件 reset**。
 4. **turn 是并发仲裁器**:两方基于同一 `turn` 并发动手时,先 push 成功者翻转 turn,
    后者的 push 必被拒(规则 3 兜底),从而串行化。普通非快进保护是本协议的前提,不是可选项。
 5. **失效的 thread 翻转不得带入后续**:一旦核对发现 turn 已变,本地那次 thread 翻转
