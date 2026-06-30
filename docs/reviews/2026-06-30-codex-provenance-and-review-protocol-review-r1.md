@@ -5,7 +5,7 @@ doc_type: review
 version: 1
 date: 2026-06-30
 authored_by: codex
-generated_with: codex-cli@0.139.0
+generated_with: codex-desktop@26.623.70822
 committed_by: win11-01
 status: changes-requested
 reviewed_by: []
@@ -110,4 +110,3 @@ push 失败不算交接且必须重新 pull/核对 turn；如允许多 commit，
 - Mode B 强制保留逐字原文，能显著降低终端转录造成的来源丢失。
 - `turn` 放入版本化 thread，并要求动手前 pull 和核对，能恢复跨会话协作上下文。
 - `authored_by` 与 `committed_by` 分列是必要基础，只需避免把声明强度夸大为验证。
-

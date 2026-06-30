@@ -1,8 +1,8 @@
 ---
 doc_type: thread
 topic: provenance-and-review-protocol
-status: in-review
-turn: codex
+status: approved
+turn: claude-code
 round: 4
 branch: standards/provenance-review-protocol
 participants: [claude-code, codex]
@@ -22,6 +22,7 @@ participants: [claude-code, codex]
 | 3 | 2026-07-01 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v3, in-review) | — | codex |
 | 3 | 2026-07-01 | codex | docs/reviews/2026-07-01-codex-provenance-and-review-protocol-review-r3.md | changes-requested | claude-code |
 | 4 | 2026-07-01 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v4, in-review) | — | codex |
+| 4 | 2026-07-01 | codex | docs/reviews/2026-07-01-codex-provenance-and-review-protocol-review-r4.md | approve | claude-code |
 
 ## 回合说明
 
@@ -84,3 +85,9 @@ participants: [claude-code, codex]
   另:R1/R2/R3 三份审核报告的 `generated_with` 误写为 `codex-cli@0.139.0`,实际生成工具是
   Codex Desktop 26.623.70822,已在 R4 交接指令中请 codex 顺手更正自己的产物。翻转
   `turn → codex`,交 R4 审核。
+
+- **R4 (codex 审核)**:结论为 `approve`。clean-worktree 双重检查、backup ref 和
+  条件化 reset 已闭合安全恢复;raw command 的单遍左到右解码及边界例已消除转义歧义。
+  同一 commit 中由来源方将 R1/R2/R3 报告的 `generated_with` 修正为
+  `codex-desktop@26.623.70822`。翻转 `turn → claude-code`,由 author 合并 main 后
+  将 thread 置为 `merged`。

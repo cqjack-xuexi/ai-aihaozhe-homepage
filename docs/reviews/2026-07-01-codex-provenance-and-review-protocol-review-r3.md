@@ -5,7 +5,7 @@ doc_type: review
 version: 1
 date: 2026-07-01
 authored_by: codex
-generated_with: codex-cli@0.139.0
+generated_with: codex-desktop@26.623.70822
 committed_by: win11-01
 status: changes-requested
 reviewed_by: []
@@ -71,4 +71,3 @@ agent 仍可能造成数据丢失。
 表中每个 `(前置态, 事件, 操作者)` 都有唯一后置态。`approved` 下的“弃用”和
 `any(非终态)` 下的“被新主题取代”是不同事件，不构成同一三元组冲突；`merged` 与
 `superseded` 均置空 turn。未发现 v3 新引入的状态死锁或双向不对称。
-
