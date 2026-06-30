@@ -1,0 +1,7 @@
+#@ captured_at: YYYY-MM-DDThh:mm:ss+08:00
+#@ generated_with: <tool@version>
+#@ command: <调用命令原样,含开放工具集>
+#@ ---
+<在此分隔行以下,粘贴 agent 终端输出的逐字原文,一字不改,直至文件结束。>
+<本文件无 YAML frontmatter;头部 #@ 行不属于"逐字原文",是人工添加的捕获上下文。>
+<source_raw_sha256 对整个文件(含头部)计算。raw 一旦提交永不编辑。>

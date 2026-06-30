@@ -1,23 +1,24 @@
 ---
 title: <审核标题>
-topic: <topic-slug>            # 与所审 spec 的 topic 相同
+topic: <topic-slug>            # 与所审文档的 topic 相同
 doc_type: review
 version: 1
 date: YYYY-MM-DD
 authored_by: <claude-code | codex | human | name>   # 审核内容生成者
-generated_with: <claude-code@x.y.z | codex-cli>      # 工具及版本
+generated_with: <tool@version>  # 强制 工具@版本,如 codex-cli@0.139.0;不可得用 <tool>@unknown
 committed_by: <git author>     # 执行 git commit 者
-status: in-review
+status: <approved | changes-requested | blocked>   # 必须与 verdict 一致(见标准 §4.2)
 reviewed_by: []
-reviews_target: docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md  # 审的哪份及其路径
-target_version: 1              # 所审 spec 的 version
+reviews_target: <仓库相对路径>  # 被审文档真实路径,任意目录(如 docs/superpowers/conventions/...)
+target_version: 1              # 所审文档的 version
 review_round: 1                # 第几轮审核
-verdict: changes-requested     # approve | changes-requested | block
-source_raw: docs/reviews/raw/YYYY-MM-DD-<reviewer>-<topic>-rN.txt  # Mode B 必填;Mode A 为 null
+verdict: changes-requested     # approve→status:approved | changes-requested→changes-requested | block→blocked
+source_raw: null               # Mode B 必填 raw 路径;Mode A 为 null
+source_raw_sha256: null        # Mode B 时为 raw 文件 sha256;Mode A 为 null
 supersedes: null
 superseded_by: null
 ---
 
 # <审核标题>
 
-<!-- 正文:总体结论 / 阻塞问题 / 建议改进 / 已合理无需调整 / 处理结论。 -->
+<!-- 正文:总体结论 / 必须修改 / 建议改进 / 已合理无需调整 / 处理结论。 -->
