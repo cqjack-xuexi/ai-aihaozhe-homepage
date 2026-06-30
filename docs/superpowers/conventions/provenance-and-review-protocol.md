@@ -7,7 +7,7 @@ date: 2026-07-01
 authored_by: claude-code
 generated_with: claude-code@2.1.196
 committed_by: win11-01
-status: in-review
+status: approved
 reviewed_by: [codex]
 source_raw: null
 source_raw_sha256: null

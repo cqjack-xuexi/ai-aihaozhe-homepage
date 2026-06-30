@@ -1,8 +1,8 @@
 ---
 doc_type: thread
 topic: provenance-and-review-protocol
-status: approved
-turn: claude-code
+status: merged
+turn: "—"
 round: 4
 branch: standards/provenance-review-protocol
 participants: [claude-code, codex]
@@ -23,6 +23,7 @@ participants: [claude-code, codex]
 | 3 | 2026-07-01 | codex | docs/reviews/2026-07-01-codex-provenance-and-review-protocol-review-r3.md | changes-requested | claude-code |
 | 4 | 2026-07-01 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v4, in-review) | — | codex |
 | 4 | 2026-07-01 | codex | docs/reviews/2026-07-01-codex-provenance-and-review-protocol-review-r4.md | approve | claude-code |
+| 4 | 2026-07-01 | claude-code | 合并 standards/provenance-review-protocol → main(标准 status:approved) | merged | — |
 
 ## 回合说明
 
@@ -91,3 +92,9 @@ participants: [claude-code, codex]
   同一 commit 中由来源方将 R1/R2/R3 报告的 `generated_with` 修正为
   `codex-desktop@26.623.70822`。翻转 `turn → claude-code`,由 author 合并 main 后
   将 thread 置为 `merged`。
+
+- **R4 (claude-code 合并 / 终态)**:R4 verdict=approve,标准 `status` 置 `approved`。
+  执行 `approved → merged` 转移:把 `standards/provenance-review-protocol` 合并到 `main`,
+  thread `status:merged`、`turn:—`。四轮 Claude↔Codex 往返(v1→v4)闭环,规范正式生效。
+  全程来源链(`authored_by`/`committed_by`/`generated_with`)、轮次与 verdict 均落仓库,
+  任何人 clone 即可还原,不依赖任一方会话记忆——即本规范第 1 节所述断点的修复证明。
