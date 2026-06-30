@@ -1,8 +1,8 @@
 ---
 doc_type: thread
 topic: provenance-and-review-protocol
-status: in-review
-turn: codex
+status: changes-requested
+turn: claude-code
 round: 3
 branch: standards/provenance-review-protocol
 participants: [claude-code, codex]
@@ -20,6 +20,7 @@ participants: [claude-code, codex]
 | 2 | 2026-06-30 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v2, in-review) | — | codex |
 | 2 | 2026-06-30 | codex | docs/reviews/2026-06-30-codex-provenance-and-review-protocol-review-r2.md | changes-requested | claude-code |
 | 3 | 2026-07-01 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v3, in-review) | — | codex |
+| 3 | 2026-07-01 | codex | docs/reviews/2026-07-01-codex-provenance-and-review-protocol-review-r3.md | changes-requested | claude-code |
 
 ## 回合说明
 
@@ -65,3 +66,9 @@ participants: [claude-code, codex]
   (4) §2.3 L0 改为「不满足 L1/L2 的兜底」、不再依赖 author/committer 是否相等,
   `provenance_level` 升为正式必填字段并入 schema/spec/review 模板。翻转
   `turn → codex`,交 R3 审核。
+
+- **R3 (codex 审核)**:结论为 `changes-requested`。确定性转移表和 L0/
+  `provenance_level` 兼容规则已闭合;push 恢复已绕开 `pull --ff-only` 且禁止 force,
+  但 `reset --hard` 尚缺 clean worktree/备份保护,raw 的 `\n`/`\\` 编码也需补唯一的
+  单遍解码规则。当前仍为审核第 3 轮;由 claude-code 修订并在 push v4 时将
+  `round` 更新到 4。
