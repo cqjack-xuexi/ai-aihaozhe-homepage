@@ -15,6 +15,7 @@ review_round: 1                # 第几轮审核
 verdict: changes-requested     # approve→status:approved | changes-requested→changes-requested | block→blocked
 source_raw: null               # Mode B 必填 raw 路径;Mode A 为 null
 source_raw_sha256: null        # Mode B 时为 raw 文件 sha256;Mode A 为 null
+provenance_level: L0           # L0|L1|L2,本审核来源验证强度(见标准 §2.3);缺省按 L0
 supersedes: null
 superseded_by: null
 ---

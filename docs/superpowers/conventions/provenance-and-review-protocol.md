@@ -2,7 +2,7 @@
 title: 内容来源标注规范与 Codex↔Claude 双向审核协议
 topic: provenance-and-review-protocol
 doc_type: spec
-version: 2
+version: 3
 date: 2026-06-30
 authored_by: claude-code
 generated_with: claude-code@2.1.196
@@ -10,6 +10,8 @@ committed_by: win11-01
 status: in-review
 reviewed_by: [codex]
 source_raw: null
+source_raw_sha256: null
+provenance_level: L0
 supersedes: null
 superseded_by: null
 ---
@@ -20,11 +22,16 @@ superseded_by: null
 > 字段,不进文件名。它本身是 **Mode A 直接产物**(由 claude-code 直接写入仓库),
 > 故 `source_raw: null`。它正在按自己定义的流程接受审核。
 >
-> **v2 修订**(回应 codex R1 `changes-requested`):区分「声明」与「验证」并定义
-> Mode A 最低佐证(§2.1);用确定性转移表重写状态机、纳入 `blocked`/`merged`、
-> 明确 round 语义(§3.2);定义 raw 为无 frontmatter 附件并规定头部边界(§2.2);
-> `generated_with` 强制 `工具@版本`(§2.1);补 push 原子性/并发/失败规则(§3.1);
-> 修复 review 模板路径与附录 status↔verdict 矛盾(§4.2、§6)。
+> **v3 修订**(回应 codex R2 `changes-requested`):转移表拆分 `blocked` 恢复为两个
+> 确定事件、补 `superseded` 进入路径、reviewer 转移写 `reviewed_by`(§3.2);重写
+> push 失败恢复为 `git fetch` + 读 `origin` 分支 thread 的可执行顺序(§3.1);定义
+> raw `command` 单行+转义语法(§2.2);L0 改为"不满足 L1/L2 的兜底",`provenance_level`
+> 升为正式必填字段并入 schema/模板(§2.3、§5)。
+>
+> **v2 修订**(回应 codex R1):区分「声明」与「验证」并定义 Mode A 最低佐证(§2.1);
+> 用确定性转移表重写状态机、纳入 `blocked`/`merged`、明确 round 语义(§3.2);定义
+> raw 为无 frontmatter 附件(§2.2);`generated_with` 强制 `工具@版本`;补 push
+> 原子性/并发/失败规则(§3.1);修复 review 模板路径与附录 status↔verdict 矛盾。
 
 ## 1. 为什么需要这套规范
 
@@ -71,6 +78,9 @@ Codex 写方案 ──→ Claude CLI 只读审核(输出到终端)──→ Code
 - `source_raw`:Mode B 时指向逐字原文存档;Mode A 为 `null`。
 - `source_raw_sha256`:Mode B 时为 raw 文件的 SHA-256(完整性关联,见 §2.2),
   使"路径存在但内容被换"可被检出;Mode A 为 `null`。
+- `provenance_level`:`L0 | L1 | L2`,本文档达到的来源验证强度(见 §2.3)。
+  **写入规则**:v3 起新建的 spec/review 必填;**读取规则**:字段缺省一律按 `L0`
+  解读(向后兼容 v3 之前、无此字段的旧文档,如 R1/R2 审核报告)。
 
 ### 支柱 2 — Raw 归档(转录类产物的逐字原文)
 
@@ -89,14 +99,18 @@ Codex 写方案 ──→ Claude CLI 只读审核(输出到终端)──→ Code
 ```
 #@ captured_at: 2026-06-30T22:10:00+08:00
 #@ generated_with: claude-code@2.1.183
-#@ command: claude -p "审核..." (开放工具: Read,Glob,Grep)
+#@ command: claude -p "审核 X\n第二行用 \\n 转义" (开放工具: Read,Glob,Grep)
 #@ ---                       <- 此分隔行以下是逐字原文,一字不改
 <agent 终端输出原样粘贴,直至文件结束>
 ```
 
-- 头部元数据每行以 `#@ ` 起始;`#@ ---` 单独成行,标记逐字正文的起始边界。
-- 头部**不属于**"逐字原文",是人工添加的捕获上下文;边界行以下才是不可改动的原文。
-- `captured_at` 用 ISO-8601 带时区;`command` 内的引号/换行按 shell 原样保留,不转义。
+- **每个头部字段恰好占一物理行**,以 `#@ ` 起始、形如 `#@ <key>: <value>`。
+  解析器逐行读取,遇到第一个独占行 `#@ ---` 即停止解析头部、其后全部视为正文。
+- **头部值不得含裸换行**:`command` 必须单行;命令本身的换行写成字面 `\n`、
+  反斜杠写成 `\\`,由读者反转义。这样任何物理换行都只可能是字段分隔或正文边界,
+  不会与 `command` 的内容混淆。
+- 头部**不属于**"逐字原文",是人工添加的捕获上下文;`#@ ---` 边界行以下才是不可改动的原文。
+- `captured_at` 用 ISO-8601 带时区。
 - `source_raw_sha256` 对**整个 raw 文件**(含头部)计算,锁定提交时的完整内容。
 
 ### 支柱 3 — 接力棒文件(表达 git 无法表达的"轮到谁")
@@ -114,19 +128,24 @@ round | date | actor | artifact 路径 | verdict | next-turn
 
 ### 2.3 来源验证强度分级(回应「声明 vs 验证」)
 
-来源声明的可信度不是布尔值,而是分级的。本规范要求每份文档**诚实标注自己达到的级别**
-(可在正文或 `provenance_level` 字段注明),不得把低级别说成高级别:
+来源声明的可信度不是布尔值,而是分级的。**v3 起新建的 spec/review 必须用 frontmatter 的
+`provenance_level` 字段(机器可读)标注自己达到的级别**,不得把低级别说成高级别;
+读取任何文档时,该字段缺省一律按 `L0` 解读(兼容 v3 之前无此字段的旧文档)。
 
-| 级别 | 名称 | 条件 | 可信度 |
-|------|------|------|--------|
-| L0 | declared | 仅 frontmatter 声明,无任何旁证(Mode A 且 `committed_by ≠ authored_by`) | 最低,等同散文自述 |
-| L1 | raw-attested | Mode B:有逐字 raw + `source_raw_sha256`,内容被换可检出 | 中,伪造需同时改原文与摘要 |
-| L2 | identity-attested | 由可信身份直接提交(签名 commit / 受控自动化 attestation) | 高,本规范暂未强制,留作演进 |
+| 级别 | 名称 | 条件(充分必要) | 可信度 |
+|------|------|----------------|--------|
+| L2 | identity-attested | 由可信身份直接提交:签名 commit 或受控自动化 attestation | 高,本规范暂未强制,留作演进 |
+| L1 | raw-attested | 不满足 L2,但有逐字 raw + 正确的 `source_raw_sha256`,内容被换可检出 | 中,伪造需同时改原文与摘要 |
+| L0 | declared | **不满足 L1 也不满足 L2 的一切文档**(兜底) | 最低,等同散文自述 |
 
-**Mode A 的最低佐证要求**:当 `committed_by ≠ authored_by`(agent 写、人代提交)时,
-该文档默认只能达到 **L0**。要提升到 L1,转录者应保留一份生成记录(如带工具元数据的
-会话导出或终端日志)作为 raw 附件并按 §2.2 记 sha256——此时 Mode A 实质退化为 Mode B。
-**在引入 L2 身份机制前,本规范任何文字均不得声称内容来源已被"机器验证"。**
+- 分级**自高向低判定**:先看是否满足 L2,否则看 L1,都不满足即 L0。
+- L0 的覆盖**不依赖 `committed_by` 与 `authored_by` 是否相等**:即使二者同名,
+  未签名提交在没有 L2 机制时仍只是声明,故仍为 L0。相等只是少一个明显的转录环节,
+  不构成佐证。
+- **Mode A 默认 L0**:agent 直接写、人代提交的文档(含本活标准自身)默认 `L0`。
+  要升到 L1,须保留带工具元数据的生成记录作为 raw 附件并按 §2.2 记 sha256
+  ——此时实质退化为 Mode B。
+- **在引入 L2 身份机制前,本规范任何文字均不得声称内容来源已被"机器验证"。**
 
 ## 3. 协议:状态机与交接规则
 
@@ -155,12 +174,21 @@ git commit + git push                 # 完成交接
    不允许"先提交产物、后单独改 thread"的两次提交——读者看到产物时 `turn` 必须已翻转。
 2. **共享分支禁止 force push**:`standards/*`、`design/*` 等协作分支永不 `--force` /
    `--force-with-lease`。历史只追加。
-3. **push 被拒 = 交接未完成**:若 push 因非快进被拒,说明对方已先 push。必须
-   `git pull --ff-only` → **重新核对 `thread.turn` 是否仍是自己** → 若 turn 已变则你的
-   这一步作废,按新状态重走;若 turn 未变则 rebase 自己的 commit 后重 push。
+3. **push 被拒 = 交接未完成**:若 push 因非快进被拒,说明对方已先 push,此时本地交接
+   commit 与远程已**分叉**(`git pull --ff-only` 必然失败,故不能用它恢复)。可执行顺序:
+   ```
+   git fetch origin                                  # 只取远程,不动本地分支
+   git show origin/<branch>:docs/reviews/<topic>.thread.md   # 读远程最新 thread
+   核对其 turn:
+     ├─ turn 已不是自己 → 你这一步作废:git reset --hard origin/<branch>
+     │                     (丢弃本地未推送的交接;不得 force push 覆盖远程),按新状态重走
+     └─ turn 仍是自己   → git rebase origin/<branch> → 重新 git push
+   ```
 4. **turn 是并发仲裁器**:两方基于同一 `turn` 并发动手时,先 push 成功者翻转 turn,
    后者的 push 必被拒(规则 3 兜底),从而串行化。普通非快进保护是本协议的前提,不是可选项。
-5. **thread 引用交接 commit**:回合表的每一行可在 `artifact` 或备注中附上完成该交接的
+5. **失效的 thread 翻转不得带入后续**:一旦核对发现 turn 已变,本地那次 thread 翻转
+   即作废,必须丢弃(reset),不允许 rebase 后把过时的翻转重新提交上去。
+6. **thread 引用交接 commit**:回合表的每一行可在 `artifact` 或备注中附上完成该交接的
    commit 短哈希,使"哪个 commit 完成了第 N 次交接"可追溯。
 
 ### 3.2 状态机(确定性转移表)
@@ -182,15 +210,22 @@ git commit + git push                 # 完成交接
 | 前置状态 | 事件 | 操作者 | 写入字段 | 交接后 turn | round | 后置状态(thread) |
 |----------|------|--------|----------|-------------|-------|-------------------|
 | (无) | 起草并 push | author | spec `status:draft→in-review` | reviewer | 1 | `in-review` |
-| in-review | verdict=approve | reviewer | review `verdict:approve, status:approved` | author | 不变 | `approved` |
-| in-review | verdict=changes-requested | reviewer | review `verdict:changes-requested, status:changes-requested` | author | 不变 | `changes-requested` |
-| in-review | verdict=block | reviewer | review `verdict:block, status:blocked` | human | 不变 | `blocked` |
+| in-review | verdict=approve | reviewer | review `verdict:approve, status:approved`;spec `reviewed_by += reviewer` | author | 不变 | `approved` |
+| in-review | verdict=changes-requested | reviewer | review `..., status:changes-requested`;spec `reviewed_by += reviewer` | author | 不变 | `changes-requested` |
+| in-review | verdict=block | reviewer | review `..., status:blocked`;spec `reviewed_by += reviewer` | human | 不变 | `blocked` |
 | changes-requested | 修订并 push | author | spec `version+1, status:in-review` | reviewer | +1 | `in-review` |
-| approved | 合并 main 并 push | author | spec `status:approved`(不变) | — (done) | 不变 | `merged` |
-| blocked | 人工解除 | human | thread 记说明 | author | 不变 | `in-review` 或 `changes-requested` |
+| approved | 合并 main 并 push | author | spec `status:approved`(不变) | — | 不变 | `merged` |
+| approved | 弃用(主题作废) | human | spec `status:superseded, superseded_by:<路径>` | — | 不变 | `superseded` |
+| any(非终态) | 被新主题取代 | human | spec `status:superseded, superseded_by:<路径>` | — | 不变 | `superseded` |
+| blocked | 解除→退回修订 | human | thread 记说明 | author | 不变 | `changes-requested` |
+| blocked | 解除→恢复审核 | human | thread 记说明 | reviewer | 不变 | `in-review` |
 
-**终态**:`merged`(成功完成,thread `turn` 置空或 `—`)、`superseded`(被新主题取代)。
-`blocked` 是**暂停态**而非终态:必须由 human 解除并写明动作,恢复到 `in-review`/`changes-requested`。
+> 拆分说明(回应 R2):`blocked` 不再是一行两态。**退回修订**交给 author、后置
+> `changes-requested`;**恢复审核**交给 reviewer、后置 `in-review`——turn 与后置态一一对应,
+> 不再冲突。`superseded` 现有明确进入事件(从 `approved` 弃用,或任意非终态被取代)。
+
+**终态**:`merged`(成功完成)、`superseded`(被取代)——两者 thread `turn` 均置 `—`。
+`blocked` 是**暂停态**而非终态:必须由 human 解除并写明动作,按上表两条之一恢复。
 
 ### 3.3 双向对称
 
@@ -237,7 +272,8 @@ review 文档的 `status` 与 `verdict` 不是独立字段,**必须一致映射*
 完整可复制模板在 `templates/` 下。各 `doc_type` 必填字段:
 
 - **spec**:`title, topic, doc_type, version, date, authored_by, generated_with,
-  committed_by, status, reviewed_by, source_raw, source_raw_sha256, supersedes, superseded_by`
+  committed_by, status, reviewed_by, source_raw, source_raw_sha256, provenance_level,
+  supersedes, superseded_by`
 - **review**:spec 全部字段 + `reviews_target, target_version, review_round, verdict`
   (`status` 必须按 §4.2 与 `verdict` 一致)
 - **thread**:`doc_type, topic, status, turn, round, branch, participants`
@@ -246,6 +282,7 @@ review 文档的 `status` 与 `verdict` 不是独立字段,**必须一致映射*
 `status` 取值(spec/thread):`draft | in-review | changes-requested | approved | merged |
 blocked | superseded`。
 `verdict` 取值(review):`approve | changes-requested | block`。
+`provenance_level` 取值:`L0 | L1 | L2`(缺省按 L0,见 §2.3)。
 `generated_with`:强制 `工具@版本`;不可得时 `工具@unknown`。
 
 ## 6. 附录:回填示例(闭合原始问题)
@@ -272,6 +309,7 @@ review_round: 1
 verdict: changes-requested          # 该审核当时给出的结论
 source_raw: docs/reviews/raw/2026-06-30-claude-noomo-inspired-homepage-r1.txt
 source_raw_sha256: <raw 文件的 sha256>
+provenance_level: L1                # 有逐字 raw + sha256 即达 L1;原文不可得则降为 L0
 supersedes: null
 superseded_by: null
 ---

@@ -11,6 +11,7 @@ status: draft                  # draft|in-review|changes-requested|approved|merg
 reviewed_by: []                # 审过它的 agent 列表
 source_raw: null               # Mode B 转录时指向 raw 存档;Mode A 直接写入则为 null
 source_raw_sha256: null        # Mode B 时为 raw 文件的 sha256;Mode A 为 null
+provenance_level: L0           # L0|L1|L2,本文档来源验证强度(见标准 §2.3);缺省按 L0
 supersedes: null               # 若取代旧版,填旧版路径
 superseded_by: null            # 若被新版取代,填新版路径
 ---
