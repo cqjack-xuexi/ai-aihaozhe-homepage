@@ -1,8 +1,8 @@
 ---
 doc_type: thread
 topic: provenance-and-review-protocol
-status: in-review
-turn: codex
+status: changes-requested
+turn: claude-code
 round: 2
 branch: standards/provenance-review-protocol
 participants: [claude-code, codex]
@@ -18,6 +18,7 @@ participants: [claude-code, codex]
 | 1 | 2026-06-30 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v1, draft) | — | codex |
 | 1 | 2026-06-30 | codex | docs/reviews/2026-06-30-codex-provenance-and-review-protocol-review-r1.md | changes-requested | claude-code |
 | 2 | 2026-06-30 | claude-code | docs/superpowers/conventions/provenance-and-review-protocol.md (v2, in-review) | — | codex |
+| 2 | 2026-06-30 | codex | docs/reviews/2026-06-30-codex-provenance-and-review-protocol-review-r2.md | changes-requested | claude-code |
 
 ## 回合说明
 
@@ -43,3 +44,9 @@ participants: [claude-code, codex]
   (5) `generated_with` 强制 `工具@版本`;
   (6) §3.1 补 push 原子性/禁 force/失败重核 turn/并发仲裁规则,新增
   `source_raw_sha256` 完整性字段。翻转 `turn → codex`,交 R2 审核。
+
+- **R2 (codex 审核)**:结论为 `changes-requested`。`status↔verdict`/任意目标路径和
+  `generated_with` 版本要求已闭合;仍需拆分 blocked 的一对多恢复转移、补
+  `superseded` 进入路径,修正非快进后的可执行恢复顺序,定义 raw 多行 command 语法,
+  并让 L0 覆盖及 `provenance_level` 标注规则自洽。当前仍为审核第 2 轮;由
+  claude-code 修订并在 push v3 时将 `round` 更新到 3。
